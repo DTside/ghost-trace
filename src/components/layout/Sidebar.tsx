@@ -1,5 +1,5 @@
 'use client';
-import { Home, BarChart2, Wallet, User, Settings, HelpCircle, LogOut } from 'lucide-react';
+import { Home, BarChart2, Wallet, User, Settings, HelpCircle, LogOut, Send } from 'lucide-react'; // Добавил Send
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
@@ -29,7 +29,7 @@ export const Sidebar = () => {
   return (
     <aside className="w-[70px] h-full bg-[#10161e] border-r border-[#19202a] flex flex-col items-center py-6 z-50 shrink-0">
       <div className="mb-8">
-        {/* НОВЫЙ ЛОГОТИП GHOST TRACE */}
+        {/* ЛОГОТИП */}
         <div className="w-10 h-10 border border-blue-500/30 bg-blue-500/10 rounded-xl flex items-center justify-center font-black text-blue-500 text-xl shadow-[0_0_15px_rgba(59,130,246,0.3)]">
             G
         </div>
@@ -43,7 +43,22 @@ export const Sidebar = () => {
       </nav>
 
       <div className="flex flex-col gap-4 w-full px-3 mb-4">
+        
+        {/* КНОПКА TELEGRAM */}
+        <a 
+            href="https://t.me/ghosttrace" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="w-full aspect-square flex items-center justify-center rounded-xl text-blue-400 hover:text-white hover:bg-blue-600 transition-all relative group"
+        >
+            <Send size={24} className="-ml-0.5 mt-0.5" /> {/* Небольшое смещение для визуального центра */}
+            <div className="absolute left-full ml-4 bg-[#2a323d] text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-[#3e4552] z-50">
+                Telegram канал
+            </div>
+        </a>
+
         <NavItem icon={<HelpCircle size={24} />} active={isActive('/help')} href="/help" tooltip="Помощь" />
+        
         <button className="w-full aspect-square flex items-center justify-center text-red-500 hover:bg-red-500/10 rounded-xl transition-colors">
             <LogOut size={24} />
         </button>

@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
-import { ArrowRight, BarChart2, Shield, Zap, X, FileText, Lock, Globe, CreditCard, Info } from 'lucide-react';
+import { ArrowRight, BarChart2, Shield, Zap, X, FileText, Lock, Globe, CreditCard, Send } from 'lucide-react';
 
 export default function LandingPage() {
   const [activeModal, setActiveModal] = useState<string | null>(null);
@@ -199,9 +199,22 @@ export default function LandingPage() {
       <footer className="border-t border-white/5 py-12 bg-[#0a0d12]">
           <div className="max-w-7xl mx-auto px-6 flex flex-col items-center">
             
-            <div className="flex items-center gap-3 mb-8 opacity-70">
-                <div className="w-8 h-8 border border-blue-500/30 bg-blue-500/10 rounded flex items-center justify-center font-black text-blue-500 text-xs shadow-[0_0_10px_rgba(59,130,246,0.2)]">G</div>
-                <span className="font-bold text-lg text-gray-300">Ghost Trace</span>
+            <div className="flex flex-col items-center gap-6 mb-8">
+                {/* LOGO */}
+                <div className="flex items-center gap-3 opacity-70">
+                    <div className="w-8 h-8 border border-blue-500/30 bg-blue-500/10 rounded flex items-center justify-center font-black text-blue-500 text-xs shadow-[0_0_10px_rgba(59,130,246,0.2)]">G</div>
+                    <span className="font-bold text-lg text-gray-300">Ghost Trace</span>
+                </div>
+
+                {/* TELEGRAM BUTTON */}
+                <a 
+                    href="https://t.me/ghosttrace" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 bg-[#2aabee]/10 hover:bg-[#2aabee]/20 text-[#2aabee] border border-[#2aabee]/20 px-5 py-2.5 rounded-full font-bold text-sm transition-all hover:scale-105 shadow-[0_0_15px_rgba(42,171,238,0.2)]"
+                >
+                    <Send size={16} /> Наш Telegram канал
+                </a>
             </div>
 
             {/* МЕНЮ ФУТЕРА (КНОПКИ МОДАЛОК) */}
