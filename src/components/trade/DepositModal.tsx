@@ -1,25 +1,25 @@
 'use client';
 import { useState } from 'react';
-import { X, Copy, Check, ArrowRight, Loader2, DollarSign } from 'lucide-react'; // QrCode больше не нужен, у нас картинки
+import { X, Copy, Check, ArrowRight, Loader2, DollarSign, AlertTriangle, ChevronLeft } from 'lucide-react';
 import { useTradeStore } from '@/store/useTradeStore';
 import { toast } from 'sonner';
 
-// НАСТРОЙКИ КОШЕЛЬКОВ И QR-КОДОВ
+// ПОЛНЫЙ СПИСОК КОШЕЛЬКОВ
 const MY_WALLETS = [
   { 
     id: 'usdt_trc20', 
     name: 'Tether USDT', 
     network: 'TRC-20', 
     icon: '₮', 
-    address: 'TB17R9ECKuVTbxrVmJ3iBiptSKPgfxARQC',
-    qrImage: '/qr/usdt_trc20.jpg' // <--- Путь к картинке в папке public/qr
+    address: 'TB17R9ECKuVTbxrVmJ3iBiplSKPgfxARQC', // Твой адрес
+    qrImage: '/qr/usdt_trc20.jpg'
   },
   { 
     id: 'btc', 
     name: 'Bitcoin', 
     network: 'BTC', 
     icon: '₿', 
-    address: 'bc1q6c2ycr64nnfn6a0yxn9vn455e80sa0huulvcem',
+    address: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh', // Пример (замени на свой)
     qrImage: '/qr/btc.jpg' 
   },
   { 
@@ -27,7 +27,7 @@ const MY_WALLETS = [
     name: 'Ethereum', 
     network: 'ERC-20', 
     icon: 'Ξ', 
-    address: '0x198794f9343Fda57Ed9e80Eb0f61b1369f68F5B7',
+    address: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F', // Пример (замени на свой)
     qrImage: '/qr/eth.jpg' 
   },
   { 
@@ -35,7 +35,7 @@ const MY_WALLETS = [
     name: 'Litecoin', 
     network: 'LTC', 
     icon: 'Ł', 
-    address: 'ltc1qayt2uw32yhmvjrctztqu4gg7ukjqdr6u0w8p3f',
+    address: 'ltc1qrg3937929007425832729904257829283742', // Пример (замени на свой)
     qrImage: '/qr/ltc.jpg' 
   },
 ];
@@ -45,6 +45,7 @@ export const DepositModal = ({ isOpen, onClose }: any) => {
   const [selectedCrypto, setSelectedCrypto] = useState<any>(null);
   const [amount, setAmount] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const { createDeposit } = useTradeStore() as any;
   const TEST_USER_ID = '5223055e-5885-40b6-9494-c482ba748050';
 
@@ -52,50 +53,65 @@ export const DepositModal = ({ isOpen, onClose }: any) => {
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success('Адрес скопирован!');
+    toast.success('Адрес скопирован');
   };
 
   const handleSubmit = async () => {
     if (!amount || isNaN(Number(amount)) || Number(amount) < 10) {
-        toast.error('Минимальная сумма пополнения $100');
+        toast.error('Минимум $10');
         return;
     }
-    setIsSubmitting(true);
-    
-    // Отправляем заявку
-    await createDeposit({
-        userId: TEST_USER_ID,
-        network: `${selectedCrypto.name} (${selectedCrypto.network})`,
-        amount: Number(amount),
-        walletTo: selectedCrypto.address
-    });
 
-    setIsSubmitting(false);
-    onClose();
-    setStep(1);
-    setAmount('');
+    setIsSubmitting(true);
+    // Имитация задержки
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    try {
+        await createDeposit({
+            userId: TEST_USER_ID,
+            network: `${selectedCrypto.name} (${selectedCrypto.network})`,
+            amount: Number(amount),
+            walletTo: selectedCrypto.address
+        });
+
+        toast.success("Заявка создана! Ожидайте подтверждения сети.");
+        onClose();
+        setStep(1);
+        setAmount('');
+    } catch (e) {
+        toast.error("Ошибка");
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-[#1e232d] w-[500px] rounded-2xl border border-[#2a323d] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200 p-4">
+      <div className="bg-[#1e232d] w-full max-w-md rounded-2xl border border-[#2a323d] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         
         {/* Header */}
-        <div className="h-16 border-b border-[#2a323d] flex items-center justify-between px-6 bg-[#1c2028]">
-          <h2 className="text-lg font-bold text-white uppercase tracking-wide">
-             {step === 1 ? 'Выберите метод' : 'Пополнение счета'}
-          </h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
-            <X size={24} />
+        <div className="h-14 border-b border-[#2a323d] flex items-center justify-between px-4 bg-[#1c2028] shrink-0">
+          <div className="flex items-center gap-2">
+              {step === 2 && (
+                  <button onClick={() => setStep(1)} className="text-gray-400 hover:text-white mr-1">
+                      <ChevronLeft size={20}/>
+                  </button>
+              )}
+              <h2 className="text-sm font-black text-white uppercase tracking-wide">
+                 {step === 1 ? 'Выберите метод' : `Пополнение ${selectedCrypto?.network}`}
+              </h2>
+          </div>
+          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors p-2 bg-[#2a323d] rounded-lg">
+            <X size={18} />
           </button>
         </div>
 
         {/* Content */}
         <div className="p-6 overflow-y-auto custom-scrollbar">
             
-            {/* ШАГ 1: ВЫБОР КРИПТЫ */}
+            {/* ШАГ 1: СПИСОК МОНЕТ */}
             {step === 1 && (
-                <div className="grid grid-cols-1 gap-3">
+                <div className="flex flex-col gap-3">
                     {MY_WALLETS.map((wallet) => (
                         <button 
                             key={wallet.id}
@@ -115,52 +131,48 @@ export const DepositModal = ({ isOpen, onClose }: any) => {
                 </div>
             )}
 
-            {/* ШАГ 2: ПЕРЕВОД И ВВОД СУММЫ */}
+            {/* ШАГ 2: ОПЛАТА */}
             {step === 2 && selectedCrypto && (
                 <div className="flex flex-col gap-6">
-                    <div className="text-center">
-                        <span className="text-xs text-gray-400 uppercase font-bold mb-2 block">Отправьте средства на адрес:</span>
-                        <div className="bg-[#12161c] p-4 rounded-xl border border-[#2a323d] flex items-center justify-between gap-3 group">
-                            <span className="text-xs font-mono text-gray-300 break-all text-left">{selectedCrypto.address}</span>
+                    {/* QR Code */}
+                    <div className="flex flex-col items-center">
+                        <div className="bg-white p-3 rounded-xl mb-4 shadow-lg">
+                             <img 
+                                src={selectedCrypto.qrImage} 
+                                alt={selectedCrypto.name} 
+                                className="w-40 h-40 object-contain"
+                                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} 
+                             />
+                        </div>
+                        
+                        <div className="w-full bg-[#12161c] p-3 rounded-xl border border-[#2a323d] flex items-center justify-between gap-3 relative group">
+                            <div className="flex flex-col overflow-hidden">
+                                <span className="text-[10px] text-gray-500 uppercase font-bold mb-1">Адрес кошелька</span>
+                                <span className="text-xs font-mono text-white truncate">{selectedCrypto.address}</span>
+                            </div>
                             <button onClick={() => handleCopy(selectedCrypto.address)} className="p-2 bg-[#262b34] rounded hover:bg-blue-600 transition-colors text-gray-400 hover:text-white shrink-0">
                                 <Copy size={16}/>
                             </button>
                         </div>
                     </div>
-
-                    {/* QR CODE БЛОК */}
-                    <div className="flex justify-center">
-                        <div className="bg-white p-2 rounded-xl">
-                             {/* Показываем картинку QR кода */}
-                             <img 
-                                src={selectedCrypto.qrImage} 
-                                alt={`${selectedCrypto.name} QR Code`}
-                                className="w-32 h-32 object-contain"
-                                onError={(e) => {
-                                    // Если картинка не найдена, скрываем её (или можно показать заглушку)
-                                    (e.target as HTMLImageElement).style.display = 'none';
-                                }}
-                             />
-                        </div>
-                    </div>
                     
-                    <div className="bg-yellow-500/10 p-3 rounded-lg border border-yellow-500/20">
-                        <p className="text-[11px] text-yellow-500 text-center leading-relaxed">
-                            ⚠️ Отправляйте только <b>{selectedCrypto.name} ({selectedCrypto.network})</b>.<br/>
-                            После отправки укажите точную сумму ниже.
+                    <div className="bg-yellow-500/10 p-3 rounded-lg border border-yellow-500/20 flex gap-3 items-start">
+                        <AlertTriangle className="text-yellow-500 shrink-0 mt-0.5" size={16}/>
+                        <p className="text-[11px] text-yellow-500 leading-relaxed">
+                            Отправляйте только <b>{selectedCrypto.name} ({selectedCrypto.network})</b>. Минимальная сумма $100  .
                         </p>
                     </div>
 
                     <div>
-                        <label className="text-xs font-bold text-gray-400 mb-2 block uppercase">Я отправил сумму ($):</label>
+                        <label className="text-xs font-bold text-gray-400 mb-2 block uppercase">Сумма пополнения ($)</label>
                         <div className="relative">
                             <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16}/>
                             <input 
                                 type="number" 
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
-                                placeholder="Например: 100"
-                                className="w-full bg-[#12161c] border border-[#2a323d] rounded-xl py-3 pl-10 pr-4 text-white font-bold focus:border-blue-500 focus:outline-none transition-colors"
+                                placeholder="100"
+                                className="w-full bg-[#12161c] border border-[#2a323d] rounded-xl py-3 pl-9 pr-4 text-white font-bold focus:border-blue-500 focus:outline-none transition-colors"
                             />
                         </div>
                     </div>
@@ -172,7 +184,7 @@ export const DepositModal = ({ isOpen, onClose }: any) => {
                         <button 
                             onClick={handleSubmit} 
                             disabled={isSubmitting}
-                            className="flex-[2] py-3 rounded-xl font-bold text-xs uppercase bg-green-600 text-white hover:bg-green-500 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-green-600/20"
+                            className="flex-[2] py-3 rounded-xl font-bold text-xs uppercase bg-green-600 text-white hover:bg-green-500 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-green-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isSubmitting ? <Loader2 className="animate-spin" size={16}/> : <Check size={16}/>}
                             Я оплатил

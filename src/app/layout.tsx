@@ -1,5 +1,6 @@
 import './globals.css';
 import type { Metadata } from 'next';
+import { Toaster } from 'sonner'; // <-- Импорт уведомлений
 
 export const metadata: Metadata = {
   title: 'Ghost Trace | Trading Platform',
@@ -12,8 +13,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="ru">
+      <body className="bg-[#0d1117] text-white">
+        {children}
+        {/* Компонент уведомлений должен быть здесь, поверх всего */}
+        <Toaster position="top-center" theme="dark" richColors closeButton />
+      </body>
     </html>
   );
 }
